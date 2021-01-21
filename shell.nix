@@ -4,6 +4,7 @@ pkgs.mkShell {
   buildInputs = with pkgs; [
     go
     pkg-config
+    gnumake
     xorg.libX11
     xorg.libXcursor
     xorg.libXrandr

@@ -1,4 +1,4 @@
-module github.com/pineappleEA/Pineapple-Windows
+module github.com/pineappleEA/pineapple-updater
 
 go 1.15
 
