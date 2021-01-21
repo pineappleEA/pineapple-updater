@@ -19,7 +19,7 @@ const pineappleSite string = "https://raw.githubusercontent.com/pineappleEA/pine
 func aboutUI() {
 	a := fyne.CurrentApp()
 	w := a.NewWindow("About")
-	w.Resize(fyne.NewSize(400, 400))
+	w.Resize(fyne.NewSize(400, 300))
 	logo := canvas.NewImageFromResource(resourceIconPng)
 	logo.FillMode = canvas.ImageFillOriginal
 	quitButton := widget.NewButton("close", func() { w.Close() })
@@ -29,6 +29,7 @@ func aboutUI() {
 	ui := fyne.NewContainerWithLayout(layout.NewBorderLayout(logo, quitButton, nil, nil), logo, quitButton, aboutText1, aboutText2, aboutText3)
 	w.SetIcon(resourceIconPng)
 	w.SetContent(ui)
+	w.SetFixedSize(true)
 	w.Show()
 }
 
