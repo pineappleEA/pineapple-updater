@@ -114,6 +114,15 @@ func downloadList() ([]int, map[int]string) {
 }
 
 func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
-	fmt.Println(versionSlice[selectedVersion])
-	fmt.Println(linkMap[versionSlice[selectedVersion]])
+	resp, err := http.Get("https://github.com/pineappleEA/pineapple-src/releases/download/EA-"+strconv.Itoa(versionSlice[selectedVersion])+"/Windows-Yuzu-EA-"+strconv.Itoa(versionSlice[selectedVersion])+".7z")
+	if err != nil {
+		// handle err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == 200 {
+		fmt.Println("Downloading from GitHub")
+	} else {
+		fmt.Println("Downloading from Anonfiles")
+	}
+
 }
