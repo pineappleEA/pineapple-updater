@@ -4,18 +4,25 @@ import (
 	"bufio"
 	"fmt"
 	"net/http"
+	"os"
 	"regexp"
 	"strconv"
+	"time"
 
 	"fyne.io/fyne"
 	"fyne.io/fyne/app"
 	"fyne.io/fyne/canvas"
 	"fyne.io/fyne/layout"
 	"fyne.io/fyne/widget"
+
+	"github.com/cavaliercoder/grab"
 )
 
 const pineappleSrc string = "https://github.com/pineappleEA/pineapple-src/"
 const pineappleSite string = "https://raw.githubusercontent.com/pineappleEA/pineappleEA.github.io/master/index.html"
+
+//TODO: set path with settings inside app
+const installPath string = "."
 
 func aboutUI() {
 	a := fyne.CurrentApp()
@@ -53,11 +60,13 @@ func loadUI(versionSlice []int, linkMap map[int]string) fyne.CanvasObject {
 		widget.NewButton("Uninstall", func() {}),
 	)
 
+	downloadProgress := widget.NewProgressBar()
+	downloadProgress.Hide()
 	buttonFooter := widget.NewHBox(
 		widget.NewButtonWithIcon("", resourceIconPng, func() { go aboutUI() }),
 		widget.NewButton("Settings", func() {}),
+		downloadProgress,
 	)
-
 	//combine three elements into one container/canvas
 	ui := fyne.NewContainerWithLayout(layout.NewBorderLayout(nil, buttonFooter, nil, buttonSide), buttonFooter, buttonSide, list)
 	return ui
@@ -147,5 +156,41 @@ func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
 }
 
 func downloadFile(link string) {
-	fmt.Println(link)
+	client := grab.NewClient()
+	req, _ := grab.NewRequest(installPath, link)
+	resp := client.Do(req)
+	downloadUI(resp)
+
+	// check for errors
+	if err := resp.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "Download failed: %v\n", err)
+		os.Exit(1)
+	}
+
+}
+
+func downloadUI(resp *grab.Response) {
+	a := fyne.CurrentApp()
+	w := a.NewWindow("Downloading...")
+	downloadProgress := widget.NewProgressBar()
+	downloadSpeed := widget.NewLabel("")
+	w.Resize(fyne.NewSize(400, 200))
+	w.SetIcon(resourceIconPng)
+	w.SetFixedSize(true)
+	w.Show()
+	go func() {
+		for {
+			time.Sleep(time.Millisecond * 250)
+			downloadProgress.SetValue(resp.Progress())
+			downloadSpeed.SetText("Download Speed: " + strconv.Itoa(int(resp.BytesPerSecond()/1000)) + "KByte/s")
+			ui := fyne.NewContainerWithLayout(layout.NewBorderLayout(nil, nil, nil, nil), downloadProgress, downloadSpeed)
+			w.SetContent(ui)
+			w.Show()
+			if int(resp.Progress()) == 1 {
+				w.Close()
+				break
+			}
+		}
+	}()
+
 }
