@@ -14,6 +14,7 @@ import (
 	"fyne.io/fyne/widget"
 )
 
+const pineappleSrc string = "https://github.com/pineappleEA/pineapple-src/"
 const pineappleSite string = "https://raw.githubusercontent.com/pineappleEA/pineappleEA.github.io/master/index.html"
 
 func aboutUI() {
@@ -114,7 +115,7 @@ func downloadList() ([]int, map[int]string) {
 }
 
 func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
-	resp, err := http.Get("https://github.com/pineappleEA/pineapple-src/releases/download/EA-" + strconv.Itoa(versionSlice[selectedVersion]) + "/Windows-Yuzu-EA-" + strconv.Itoa(versionSlice[selectedVersion]) + ".7z")
+	resp, err := http.Get(pineappleSrc + "releases/download/EA-" + strconv.Itoa(versionSlice[selectedVersion]) + "/Windows-Yuzu-EA-" + strconv.Itoa(versionSlice[selectedVersion]) + ".7z")
 	if err != nil {
 		// handle err
 	}
@@ -122,7 +123,7 @@ func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
 	var downloadLink string
 	if resp.StatusCode == 200 {
 		// Downloading from Github
-		downloadLink = "https://github.com/pineappleEA/pineapple-src/releases/download/EA-" + strconv.Itoa(versionSlice[selectedVersion]) + "/Windows-Yuzu-EA-" + strconv.Itoa(versionSlice[selectedVersion]) + ".7z"
+		downloadLink = pineappleSrc + "releases/download/EA-" + strconv.Itoa(versionSlice[selectedVersion]) + "/Windows-Yuzu-EA-" + strconv.Itoa(versionSlice[selectedVersion]) + ".7z"
 	} else {
 		//Download from Anonfiles
 		//Download Anonfiles page to grab direct download
