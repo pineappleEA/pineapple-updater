@@ -114,15 +114,37 @@ func downloadList() ([]int, map[int]string) {
 }
 
 func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
-	resp, err := http.Get("https://github.com/pineappleEA/pineapple-src/releases/download/EA-"+strconv.Itoa(versionSlice[selectedVersion])+"/Windows-Yuzu-EA-"+strconv.Itoa(versionSlice[selectedVersion])+".7z")
+	resp, err := http.Get("https://github.com/pineappleEA/pineapple-src/releases/download/EA-" + strconv.Itoa(versionSlice[selectedVersion]) + "/Windows-Yuzu-EA-" + strconv.Itoa(versionSlice[selectedVersion]) + ".7z")
 	if err != nil {
 		// handle err
 	}
 	defer resp.Body.Close()
+	var downloadLink string
 	if resp.StatusCode == 200 {
-		fmt.Println("Downloading from GitHub")
+		// Downloading from Github
+		downloadLink = "https://github.com/pineappleEA/pineapple-src/releases/download/EA-" + strconv.Itoa(versionSlice[selectedVersion]) + "/Windows-Yuzu-EA-" + strconv.Itoa(versionSlice[selectedVersion]) + ".7z"
 	} else {
-		fmt.Println("Downloading from Anonfiles")
+		//Download from Anonfiles
+		//Download Anonfiles page to grab direct download
+		resp, err := http.Get(linkMap[versionSlice[selectedVersion]])
+		if err != nil {
+			// handle err
+		}
+		//go line through line and search for direct download link with regex
+		//TODO: fail safely in case no links can be found
+		scanner := bufio.NewScanner(resp.Body)
+		for i := 0; scanner.Scan(); i++ {
+			linkPattern, _ := regexp.Compile("https://cdn-.*anonfiles.*7z")
+			if linkPattern.MatchString(scanner.Text()) {
+				downloadLink = linkPattern.FindString(scanner.Text())
+				break
+			}
+		}
+		defer resp.Body.Close()
 	}
+	downloadFile(downloadLink)
+}
 
+func downloadFile(link string) {
+	fmt.Println(link)
 }
