@@ -188,7 +188,6 @@ func downloadUI(resp *grab.Response) {
 			downloadSpeed.SetText("Download Speed: " + strconv.Itoa(int(resp.BytesPerSecond()/1000)) + "KByte/s")
 			ui := fyne.NewContainerWithLayout(layout.NewBorderLayout(nil, nil, nil, nil), downloadProgress, downloadSpeed)
 			w.SetContent(ui)
-			w.Show()
 			if int(resp.Progress()) == 1 {
 				w.Close()
 				break
