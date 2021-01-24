@@ -9,11 +9,12 @@ import (
 	"strconv"
 	"time"
 
-	"fyne.io/fyne"
-	"fyne.io/fyne/app"
-	"fyne.io/fyne/canvas"
-	"fyne.io/fyne/layout"
-	"fyne.io/fyne/widget"
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/canvas"
+	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/widget"
+	"fyne.io/fyne/v2/container"
 
 	"github.com/cavaliercoder/grab"
 )
@@ -55,14 +56,16 @@ func loadUI(versionSlice []int, linkMap map[int]string) fyne.CanvasObject {
 	var selectedVersion int = 0
 	list.OnSelected = func(id int) { selectedVersion = id }
 
-	buttonSide := widget.NewVBox(
+	buttonSide := container.New(
+		layout.NewVBoxLayout(),
 		widget.NewButton("Install", func() { install(versionSlice, linkMap, selectedVersion) }),
 		widget.NewButton("Uninstall", func() {}),
 	)
 
 	downloadProgress := widget.NewProgressBar()
 	downloadProgress.Hide()
-	buttonFooter := widget.NewHBox(
+	buttonFooter := container.New(
+		layout.NewHBoxLayout(),
 		widget.NewButtonWithIcon("", resourceIconPng, func() { go aboutUI() }),
 		widget.NewButton("Settings", func() {}),
 		downloadProgress,
