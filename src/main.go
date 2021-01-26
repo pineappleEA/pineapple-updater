@@ -82,7 +82,8 @@ func main() {
 	versionSlice, linkMap := downloadList()
 	w.SetContent(loadUI(versionSlice, linkMap))
 	w.Resize(fyne.NewSize(500, 450))
-	w.ShowAndRun()
+	w.Show()
+	a.Run()
 }
 
 func downloadList() ([]int, map[int]string) {
@@ -180,14 +181,14 @@ func downloadUI(resp *grab.Response) {
 	w.Resize(fyne.NewSize(400, 200))
 	w.SetIcon(resourceIconPng)
 	w.SetFixedSize(true)
+	ui := fyne.NewContainerWithLayout(layout.NewBorderLayout(nil, nil, nil, nil), downloadProgress, downloadSpeed)
+	w.SetContent(ui)
 	w.Show()
 	go func() {
 		for {
 			time.Sleep(time.Millisecond * 250)
 			downloadProgress.SetValue(resp.Progress())
 			downloadSpeed.SetText("Download Speed: " + strconv.Itoa(int(resp.BytesPerSecond()/1000)) + "KByte/s")
-			ui := fyne.NewContainerWithLayout(layout.NewBorderLayout(nil, nil, nil, nil), downloadProgress, downloadSpeed)
-			w.SetContent(ui)
 			if int(resp.Progress()) == 1 {
 				w.Close()
 				break
