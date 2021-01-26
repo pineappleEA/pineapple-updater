@@ -25,7 +25,7 @@ func main() {
 	w := a.NewWindow("PinEApple Updater")
 	w.SetIcon(resourceIconPng)
 	versionSlice, linkMap := downloadList()
-	w.SetContent(loadUI(versionSlice, linkMap))
+	w.SetContent(mainUI(versionSlice, linkMap))
 	w.Resize(fyne.NewSize(500, 450))
 	w.Show()
 	a.Run()

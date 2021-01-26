@@ -31,7 +31,7 @@ func aboutUI() {
 	w.Show()
 }
 
-func loadUI(versionSlice []int, linkMap map[int]string) fyne.CanvasObject {
+func mainUI(versionSlice []int, linkMap map[int]string) fyne.CanvasObject {
 
 	list := widget.NewList(
 		func() int { return len(versionSlice) },
