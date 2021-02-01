@@ -16,12 +16,14 @@ import (
 
 const pineappleSrc string = "https://github.com/pineappleEA/pineapple-src/"
 const pineappleSite string = "https://raw.githubusercontent.com/pineappleEA/pineappleEA.github.io/master/index.html"
+//TODO: set actually usable default install path
+const defaultPath string = "C:/yuzu"
 
 //TODO: set path with settings inside app
 const installPath string = "."
 
 func main() {
-	a := app.New()
+	a := app.NewWithID("pinEApple updater")
 	w := a.NewWindow("PinEApple Updater")
 	w.SetIcon(resourceIconPng)
 	versionSlice, linkMap := downloadList()

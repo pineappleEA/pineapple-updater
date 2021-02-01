@@ -56,7 +56,7 @@ func mainUI(versionSlice []int, linkMap map[int]string) fyne.CanvasObject {
 	buttonFooter := container.New(
 		layout.NewHBoxLayout(),
 		widget.NewButtonWithIcon("", resourceIconPng, func() { go aboutUI() }),
-		widget.NewButton("Settings", func() {}),
+		widget.NewButton("Settings", func() { settingsUI() }),
 		downloadProgress,
 	)
 	//combine three elements into one container/canvas
@@ -72,7 +72,8 @@ func downloadUI(resp *grab.Response) {
 	w.Resize(fyne.NewSize(400, 200))
 	w.SetIcon(resourceIconPng)
 	w.SetFixedSize(true)
-	ui := fyne.NewContainerWithLayout(layout.NewBorderLayout(nil, nil, nil, nil), downloadProgress, downloadSpeed)
+	w.SetCloseIntercept(func() { resp.Cancel() })
+	ui := fyne.NewContainerWithLayout(layout.NewBorderLayout(downloadProgress, nil, nil, nil), downloadProgress, downloadSpeed)
 	w.SetContent(ui)
 	w.Show()
 	go func() {
@@ -87,4 +88,14 @@ func downloadUI(resp *grab.Response) {
 		}
 	}()
 
+}
+
+func settingsUI() {
+	a := fyne.CurrentApp()
+	w := a.NewWindow("Settings")
+	installPath := widget.NewLabel(a.Preferences().StringWithFallback("path", defaultPath))
+	setPath := widget.NewButton("Set path", func() { })
+	ui := container.New(layout.NewHBoxLayout(), installPath, setPath)
+	w.SetContent(ui)
+	w.Show()
 }
