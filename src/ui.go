@@ -3,12 +3,14 @@ package main
 import (
 	"strconv"
 	"time"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 
 	"github.com/cavaliercoder/grab"
 )
@@ -93,12 +95,20 @@ func downloadUI(resp *grab.Response) {
 }
 
 //TODO: make it pretty (fixed window size?) and add checkmark to create shortcuts
+//TODO: update window when Path is changed
 func settingsUI() {
 	a := fyne.CurrentApp()
 	w := a.NewWindow("Settings")
+	w.Resize(fyne.NewSize(500,400))
 	installPath := widget.NewLabel(a.Preferences().StringWithFallback("path", defaultPath))
-	setPath := widget.NewButton("Set path", func() { })
+	setPath := widget.NewButton("Set path", func() { dialog.ShowFolderOpen(func(uri fyne.ListableURI, err error){ setPath(uri, err) }, w) })
 	ui := container.New(layout.NewHBoxLayout(), installPath, setPath)
 	w.SetContent(ui)
 	w.Show()
+}
+
+//remove filename from path, because fyne is dumb
+func setPath(path fyne.ListableURI, err error) {
+	pathString, err := path.List()
+	fyne.CurrentApp().Preferences().SetString("path", strings.TrimRight(pathString[0].Path(), pathString[0].Name()))
 }
