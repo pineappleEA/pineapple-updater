@@ -19,9 +19,6 @@ const pineappleSite string = "https://raw.githubusercontent.com/pineappleEA/pine
 //TODO: set actually usable default install path
 const defaultPath string = "C:/yuzu"
 
-//TODO: set path with settings inside app
-const installPath string = "."
-
 func main() {
 	a := app.NewWithID("pinEApple updater")
 	w := a.NewWindow("PinEApple Updater")
@@ -41,7 +38,8 @@ func downloadList() ([]int, map[int]string) {
 	//download site into resp
 	resp, err := http.Get(pineappleSite)
 	if err != nil {
-		// handle err
+		fmt.Fprintf(os.Stderr, "Could not obtain list of files!\n", err)
+		os.Exit(1)
 	}
 	defer resp.Body.Close()
 
@@ -75,10 +73,7 @@ func downloadList() ([]int, map[int]string) {
 }
 
 func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
-	resp, err := http.Get(pineappleSrc + "releases/download/EA-" + strconv.Itoa(versionSlice[selectedVersion]) + "/Windows-Yuzu-EA-" + strconv.Itoa(versionSlice[selectedVersion]) + ".7z")
-	if err != nil {
-		// handle err
-	}
+	resp, _ := http.Get(pineappleSrc + "releases/download/EA-" + strconv.Itoa(versionSlice[selectedVersion]) + "/Windows-Yuzu-EA-" + strconv.Itoa(versionSlice[selectedVersion]) + ".7z")
 	defer resp.Body.Close()
 	var downloadLink string
 	if resp.StatusCode == 200 {
@@ -89,7 +84,8 @@ func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
 		//Download Anonfiles page to grab direct download
 		resp, err := http.Get(linkMap[versionSlice[selectedVersion]])
 		if err != nil {
-			// handle err
+			fmt.Fprintf(os.Stderr, "Neither GDrive nor Anonfiles responds! Exiting...\n", err)
+			os.Exit(1)
 		}
 		//go line through line and search for direct download link with regex
 		//TODO: fail safely in case no links can be found
@@ -106,9 +102,10 @@ func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
 	downloadFile(downloadLink)
 }
 
+//Downloads file from given link to set path
 func downloadFile(link string) {
 	client := grab.NewClient()
-	req, _ := grab.NewRequest(installPath, link)
+	req, _ := grab.NewRequest(fyne.CurrentApp().Preferences().StringWithFallback("path",defaultPath), link)
 	resp := client.Do(req)
 	downloadUI(resp)
 

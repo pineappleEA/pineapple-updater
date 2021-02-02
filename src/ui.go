@@ -18,6 +18,8 @@ func aboutUI() {
 	a := fyne.CurrentApp()
 	w := a.NewWindow("About")
 	w.Resize(fyne.NewSize(400, 300))
+	
+	//TODO: set proper layout instead of using newlines in labels
 	logo := canvas.NewImageFromResource(resourceIconPng)
 	logo.FillMode = canvas.ImageFillOriginal
 	quitButton := widget.NewButton("close", func() { w.Close() })
@@ -25,6 +27,7 @@ func aboutUI() {
 	aboutText2 := widget.NewLabelWithStyle("\nFrom EmuWorld with love\n2021", fyne.TextAlignCenter, fyne.TextStyle{Italic: true})
 	aboutText3 := widget.NewLabelWithStyle("\n\n\nThis program is free software; you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation; either version 2 of the License, or\n(at your option) any later version.", fyne.TextAlignCenter, fyne.TextStyle{})
 	ui := fyne.NewContainerWithLayout(layout.NewBorderLayout(logo, quitButton, nil, nil), logo, quitButton, aboutText1, aboutText2, aboutText3)
+
 	w.SetIcon(resourceIconPng)
 	w.SetContent(ui)
 	w.SetFixedSize(true)
@@ -51,19 +54,17 @@ func mainUI(versionSlice []int, linkMap map[int]string) fyne.CanvasObject {
 		widget.NewButton("Uninstall", func() {}),
 	)
 
-	downloadProgress := widget.NewProgressBar()
-	downloadProgress.Hide()
 	buttonFooter := container.New(
 		layout.NewHBoxLayout(),
 		widget.NewButtonWithIcon("", resourceIconPng, func() { go aboutUI() }),
 		widget.NewButton("Settings", func() { settingsUI() }),
-		downloadProgress,
 	)
 	//combine three elements into one container/canvas
 	ui := fyne.NewContainerWithLayout(layout.NewBorderLayout(nil, buttonFooter, nil, buttonSide), buttonFooter, buttonSide, list)
 	return ui
 }
 
+//TODO: make it pretty and add ETA
 func downloadUI(resp *grab.Response) {
 	a := fyne.CurrentApp()
 	w := a.NewWindow("Downloading...")
@@ -76,6 +77,7 @@ func downloadUI(resp *grab.Response) {
 	ui := fyne.NewContainerWithLayout(layout.NewBorderLayout(downloadProgress, nil, nil, nil), downloadProgress, downloadSpeed)
 	w.SetContent(ui)
 	w.Show()
+	//async loop to update the UI
 	go func() {
 		for {
 			time.Sleep(time.Millisecond * 250)
@@ -90,6 +92,7 @@ func downloadUI(resp *grab.Response) {
 
 }
 
+//TODO: make it pretty (fixed window size?) and add checkmark to create shortcuts
 func settingsUI() {
 	a := fyne.CurrentApp()
 	w := a.NewWindow("Settings")
