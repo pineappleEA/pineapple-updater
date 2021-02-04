@@ -1,4 +1,4 @@
-GOFILES := src/main.go src/data.go
+GOFILES := src/main.go src/data.go src/ui.go
 
 build:
 	go build -o bin/pineapple-updater ${GOFILES}
