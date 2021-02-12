@@ -1,6 +1,9 @@
 GOFILES := src/main.go src/data.go src/ui.go
 
 build:
+	go build -ldflags "-s -w" -o bin/pineapple-updater ${GOFILES}
+
+debug:
 	go build -o bin/pineapple-updater ${GOFILES}
 
 run:
