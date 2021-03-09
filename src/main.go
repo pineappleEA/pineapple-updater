@@ -47,18 +47,17 @@ func downloadList() ([]int, map[int]string) {
 	scanner := bufio.NewScanner(resp.Body)
 	for i := 0; scanner.Scan(); i++ {
 		var line = scanner.Text()
-		match, _ := regexp.MatchString("https://anonfiles.com", line)
+		match, _ := regexp.MatchString("EA [0-9]", line)
+		// extract version number
+		versionPattern, _ := regexp.Compile("EA [0-9]*")
+		versionString := versionPattern.FindString(scanner.Text())
+		numberPattern, _ := regexp.Compile("[0-9]*$")
+		versionString = numberPattern.FindString(versionString)
+		version, _ := strconv.Atoi(versionString)
 		if match {
 			// extract link
 			linkPattern, _ := regexp.Compile("https://anonfiles.com/.*/YuzuEA-[0-9]*_7z")
 			link := linkPattern.FindString(scanner.Text())
-
-			// extract version number
-			versionPattern, _ := regexp.Compile("EA [0-9]*")
-			versionString := versionPattern.FindString(scanner.Text())
-			numberPattern, _ := regexp.Compile("[0-9]*$")
-			versionString = numberPattern.FindString(versionString)
-			version, _ := strconv.Atoi(versionString)
 
 			//save link in map
 			linkMap[version] = link
