@@ -7,6 +7,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"context"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -103,10 +104,13 @@ func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
 
 //Downloads file from given link to set path
 func downloadFile(link string) {
-	client := grab.NewClient()
 	req, _ := grab.NewRequest(fyne.CurrentApp().Preferences().StringWithFallback("path",defaultPath), link)
-	resp := client.Do(req)
-	downloadUI(resp)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	
+	req = req.WithContext(ctx)
+	resp := grab.DefaultClient.Do(req)
+	downloadUI(resp, cancel)
 
 	// check for errors
 	if err := resp.Err(); err != nil {

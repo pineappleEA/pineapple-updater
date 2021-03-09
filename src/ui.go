@@ -67,7 +67,7 @@ func mainUI(versionSlice []int, linkMap map[int]string) fyne.CanvasObject {
 }
 
 //TODO: make it pretty and add ETA
-func downloadUI(resp *grab.Response) {
+func downloadUI(resp *grab.Response, cancel func()) {
 	a := fyne.CurrentApp()
 	w := a.NewWindow("Downloading...")
 	downloadProgress := widget.NewProgressBar()
@@ -75,7 +75,7 @@ func downloadUI(resp *grab.Response) {
 	w.Resize(fyne.NewSize(400, 200))
 	w.SetIcon(resourceIconPng)
 	w.SetFixedSize(true)
-	w.SetCloseIntercept(func() { resp.Cancel() })
+	w.SetOnClosed(func() {  cancel() })
 	ui := fyne.NewContainerWithLayout(layout.NewBorderLayout(downloadProgress, nil, nil, nil), downloadProgress, downloadSpeed)
 	w.SetContent(ui)
 	w.Show()
