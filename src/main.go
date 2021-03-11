@@ -113,7 +113,7 @@ func downloadFile(link string) {
 	downloadUI(resp, cancel)
 
 	// check for errors
-	if err := resp.Err(); err != nil {
+	if err := resp.Err(); err != nil && err.Error() != "context canceled" {
 		fmt.Fprintf(os.Stderr, "Download failed: %v\n", err)
 		os.Exit(1)
 	}
