@@ -16,7 +16,7 @@ import (
 )
 
 const pineappleSrc string = "https://github.com/pineappleEA/pineapple-src/"
-const pineappleSite string = "https://raw.githubusercontent.com/pineappleEA/pineappleEA.github.io/master/index.html"
+const pineappleSite string = "https://pineappleEA.github.io/"
 //TODO: set actually usable default install path
 const defaultPath string = "C:/yuzu"
 
