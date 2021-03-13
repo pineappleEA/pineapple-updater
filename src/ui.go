@@ -96,6 +96,7 @@ func downloadUI(resp *grab.Response, cancel func()) {
 
 //TODO: make it pretty (fixed window size?) and add checkmark to create shortcuts
 //TODO: update window when Path is changed
+//TODO: make the file browser bigger by default (seperate window?)
 func settingsUI() {
 	a := fyne.CurrentApp()
 	w := a.NewWindow("Settings")

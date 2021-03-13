@@ -112,12 +112,14 @@ func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
 
 //Downloads file from given link to set path
 func downloadFile(link string) {
+	//TODO: figure out proper way to set the path for windows
 	req, _ := grab.NewRequest(fyne.CurrentApp().Preferences().StringWithFallback("path",defaultPath), link)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	
 	req = req.WithContext(ctx)
 	resp := grab.DefaultClient.Do(req)
+	//TODO: figure out why the mainUI is unresponsive when the downloadUI is open
 	go downloadUI(resp, cancel)
 
 	// check for errors
