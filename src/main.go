@@ -2,12 +2,12 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"net/http"
 	"os"
 	"regexp"
 	"strconv"
 	"context"
+	"log"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -21,9 +21,15 @@ const pineappleSite string = "https://pineappleEA.github.io/"
 const defaultPath string = "C:/yuzu"
 
 func main() {
+	logfile, err := os.Create("log.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.SetOutput(logfile)
 	a := app.NewWithID("pinEApple updater")
 	w := a.NewWindow("PinEApple Updater")
 	w.SetIcon(resourceIconPng)
+	log.Println("Downloading available versions from pineappleea.github.io")
 	versionSlice, linkMap := downloadList()
 	w.SetContent(mainUI(versionSlice, linkMap))
 	w.Resize(fyne.NewSize(500, 450))
@@ -39,8 +45,7 @@ func downloadList() ([]int, map[int]string) {
 	//download site into resp
 	resp, err := http.Get(pineappleSite)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Could not obtain list of files!\n", err)
-		os.Exit(1)
+		log.Fatal(os.Stderr, "Could not obtain list of versions!\n", err)
 	}
 	defer resp.Body.Close()
 
@@ -70,13 +75,14 @@ func downloadList() ([]int, map[int]string) {
 		}
 	}
 	if len(versionSlice) <= 1 {
-		fmt.Fprintf(os.Stderr, "Could not obtain list of files!\n")
-		os.Exit(1)
+		log.Fatal(os.Stderr, "Could not obtain list of files!\n")
 	}
+	log.Println("Found "+strconv.Itoa(len(versionSlice))+" versions")
 	return versionSlice, linkMap
 }
 
 func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
+	log.Println("Trying to install version "+strconv.Itoa(versionSlice[selectedVersion]))
 	resp, _ := http.Get(pineappleSrc + "releases/download/EA-" + strconv.Itoa(versionSlice[selectedVersion]) + "/Windows-Yuzu-EA-" + strconv.Itoa(versionSlice[selectedVersion]) + ".7z")
 	defer resp.Body.Close()
 	var downloadLink string
@@ -88,8 +94,7 @@ func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
 		//Download Anonfiles page to grab direct download
 		resp, err := http.Get(linkMap[versionSlice[selectedVersion]])
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Neither GDrive nor Anonfiles responds! Exiting...\n", err)
-			os.Exit(1)
+			log.Fatal(os.Stderr, "Neither GDrive nor Anonfiles responds! Exiting...\n", err)
 		}
 		//go line through line and search for direct download link with regex
 		scanner := bufio.NewScanner(resp.Body)
@@ -102,8 +107,7 @@ func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
 		}
 		//exit if no download link found
 		if downloadLink == "" {
-			fmt.Fprintf(os.Stderr, "No download link found, Anonfiles seems to have issues! Exiting...\n")
-			os.Exit(1)
+			log.Fatal(os.Stderr, "No download link found, Anonfiles or Github seems to be having issues! Exiting...\n")
 		}
 		defer resp.Body.Close()
 	}
@@ -112,6 +116,7 @@ func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
 
 //Downloads file from given link to set path
 func downloadFile(link string) {
+	log.Println("Downloading from "+link)
 	//TODO: figure out proper way to set the path for windows
 	req, _ := grab.NewRequest(fyne.CurrentApp().Preferences().StringWithFallback("path",defaultPath), link)
 	ctx, cancel := context.WithCancel(context.Background())
@@ -124,8 +129,7 @@ func downloadFile(link string) {
 
 	// check for errors
 	if err := resp.Err(); err != nil && err.Error() != "context canceled" {
-		fmt.Fprintf(os.Stderr, "Download failed: %v\n", err)
-		os.Exit(1)
+		log.Fatal(os.Stderr, "Download failed: %v\n", err)
 	}
 
 }
