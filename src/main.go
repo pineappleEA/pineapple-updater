@@ -69,6 +69,10 @@ func downloadList() ([]int, map[int]string) {
 			break
 		}
 	}
+	if len(versionSlice) <= 1 {
+		fmt.Fprintf(os.Stderr, "Could not obtain list of files!\n")
+		os.Exit(1)
+	}
 	return versionSlice, linkMap
 }
 
@@ -110,7 +114,7 @@ func downloadFile(link string) {
 	
 	req = req.WithContext(ctx)
 	resp := grab.DefaultClient.Do(req)
-	downloadUI(resp, cancel)
+	go downloadUI(resp, cancel)
 
 	// check for errors
 	if err := resp.Err(); err != nil && err.Error() != "context canceled" {
