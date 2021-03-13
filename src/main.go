@@ -92,14 +92,18 @@ func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
 			os.Exit(1)
 		}
 		//go line through line and search for direct download link with regex
-		//TODO: fail safely in case no links can be found
 		scanner := bufio.NewScanner(resp.Body)
-		for i := 0; scanner.Scan(); i++ {
+		for scanner.Scan() {
 			linkPattern, _ := regexp.Compile("https://cdn-.*anonfiles.*7z")
 			if linkPattern.MatchString(scanner.Text()) {
 				downloadLink = linkPattern.FindString(scanner.Text())
 				break
 			}
+		}
+		//exit if no download link found
+		if downloadLink == "" {
+			fmt.Fprintf(os.Stderr, "No download link found, Anonfiles seems to have issues! Exiting...\n")
+			os.Exit(1)
 		}
 		defer resp.Body.Close()
 	}
