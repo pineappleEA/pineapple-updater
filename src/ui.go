@@ -2,25 +2,24 @@ package main
 
 import (
 	"strconv"
-	"time"
 	"strings"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/layout"
-	"fyne.io/fyne/v2/widget"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/widget"
 
 	"github.com/cavaliercoder/grab"
 )
-
 
 func aboutUI() {
 	a := fyne.CurrentApp()
 	w := a.NewWindow("About")
 	w.Resize(fyne.NewSize(400, 300))
-	
+
 	//TODO: set proper layout instead of using newlines in labels
 	logo := canvas.NewImageFromResource(resourceIconPng)
 	logo.FillMode = canvas.ImageFillOriginal
@@ -75,7 +74,7 @@ func downloadUI(resp *grab.Response, cancel func()) {
 	w.Resize(fyne.NewSize(400, 200))
 	w.SetIcon(resourceIconPng)
 	w.SetFixedSize(true)
-	w.SetOnClosed(func() {  cancel() })
+	w.SetOnClosed(func() { cancel() })
 	ui := fyne.NewContainerWithLayout(layout.NewBorderLayout(downloadProgress, nil, nil, nil), downloadProgress, downloadSpeed)
 	w.SetContent(ui)
 	w.Show()
@@ -100,9 +99,9 @@ func downloadUI(resp *grab.Response, cancel func()) {
 func settingsUI() {
 	a := fyne.CurrentApp()
 	w := a.NewWindow("Settings")
-	w.Resize(fyne.NewSize(500,400))
+	w.Resize(fyne.NewSize(500, 400))
 	installPath := widget.NewLabel(a.Preferences().StringWithFallback("path", defaultPath))
-	setPath := widget.NewButton("Set path", func() { dialog.ShowFolderOpen(func(uri fyne.ListableURI, err error){ setPath(uri, err) }, w) })
+	setPath := widget.NewButton("Set path", func() { dialog.ShowFolderOpen(func(uri fyne.ListableURI, err error) { setPath(uri, err) }, w) })
 	ui := container.New(layout.NewHBoxLayout(), installPath, setPath)
 	w.SetContent(ui)
 	w.Show()

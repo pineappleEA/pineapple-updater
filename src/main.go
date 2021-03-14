@@ -2,12 +2,12 @@ package main
 
 import (
 	"bufio"
+	"context"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
 	"strconv"
-	"context"
-	"log"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -17,6 +17,7 @@ import (
 
 const pineappleSrc string = "https://github.com/pineappleEA/pineapple-src/"
 const pineappleSite string = "https://pineappleEA.github.io/"
+
 //TODO: set actually usable default install path
 const defaultPath string = "C:/yuzu"
 
@@ -77,12 +78,12 @@ func downloadList() ([]int, map[int]string) {
 	if len(versionSlice) <= 1 {
 		log.Fatal(os.Stderr, "Could not obtain list of files!\n")
 	}
-	log.Println("Found "+strconv.Itoa(len(versionSlice))+" versions")
+	log.Println("Found " + strconv.Itoa(len(versionSlice)) + " versions")
 	return versionSlice, linkMap
 }
 
 func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
-	log.Println("Trying to install version "+strconv.Itoa(versionSlice[selectedVersion]))
+	log.Println("Trying to install version " + strconv.Itoa(versionSlice[selectedVersion]))
 	resp, _ := http.Get(pineappleSrc + "releases/download/EA-" + strconv.Itoa(versionSlice[selectedVersion]) + "/Windows-Yuzu-EA-" + strconv.Itoa(versionSlice[selectedVersion]) + ".7z")
 	defer resp.Body.Close()
 	var downloadLink string
@@ -116,12 +117,12 @@ func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
 
 //Downloads file from given link to set path
 func downloadFile(link string) {
-	log.Println("Downloading from "+link)
+	log.Println("Downloading from " + link)
 	//TODO: figure out proper way to set the path for windows
-	req, _ := grab.NewRequest(fyne.CurrentApp().Preferences().StringWithFallback("path",defaultPath), link)
+	req, _ := grab.NewRequest(fyne.CurrentApp().Preferences().StringWithFallback("path", defaultPath), link)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	
+
 	req = req.WithContext(ctx)
 	resp := grab.DefaultClient.Do(req)
 	//TODO: figure out why the mainUI is unresponsive when the downloadUI is open
