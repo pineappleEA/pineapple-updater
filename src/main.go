@@ -63,7 +63,7 @@ func downloadList() ([]int, map[int]string) {
 		version, _ := strconv.Atoi(versionString)
 		if match {
 			// extract link
-			linkPattern, _ := regexp.Compile("https://anonfiles.com/.*/YuzuEA-[0-9]*_7z")
+			linkPattern, _ := regexp.Compile("https://anonfiles.com/.*/YuzuEA-[0-9]*_zip")
 			link := linkPattern.FindString(scanner.Text())
 
 			//save link in map
@@ -84,12 +84,12 @@ func downloadList() ([]int, map[int]string) {
 
 func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
 	log.Println("Trying to install version " + strconv.Itoa(versionSlice[selectedVersion]))
-	resp, _ := http.Get(pineappleSrc + "releases/download/EA-" + strconv.Itoa(versionSlice[selectedVersion]) + "/Windows-Yuzu-EA-" + strconv.Itoa(versionSlice[selectedVersion]) + ".7z")
+	resp, _ := http.Get(pineappleSrc + "releases/download/EA-" + strconv.Itoa(versionSlice[selectedVersion]) + "/Windows-Yuzu-EA-" + strconv.Itoa(versionSlice[selectedVersion]) + ".zip")
 	defer resp.Body.Close()
 	var downloadLink string
 	if resp.StatusCode == 200 {
 		// Downloading from Github
-		downloadLink = pineappleSrc + "releases/download/EA-" + strconv.Itoa(versionSlice[selectedVersion]) + "/Windows-Yuzu-EA-" + strconv.Itoa(versionSlice[selectedVersion]) + ".7z"
+		downloadLink = pineappleSrc + "releases/download/EA-" + strconv.Itoa(versionSlice[selectedVersion]) + "/Windows-Yuzu-EA-" + strconv.Itoa(versionSlice[selectedVersion]) + ".zip"
 	} else {
 		//Download from Anonfiles
 		//Download Anonfiles page to grab direct download
@@ -100,7 +100,7 @@ func install(versionSlice []int, linkMap map[int]string, selectedVersion int) {
 		//go line through line and search for direct download link with regex
 		scanner := bufio.NewScanner(resp.Body)
 		for scanner.Scan() {
-			linkPattern, _ := regexp.Compile("https://cdn-.*anonfiles.*7z")
+			linkPattern, _ := regexp.Compile("https://cdn-.*anonfiles.*zip")
 			if linkPattern.MatchString(scanner.Text()) {
 				downloadLink = linkPattern.FindString(scanner.Text())
 				break
